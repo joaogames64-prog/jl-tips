@@ -98,7 +98,7 @@ const App = (() => {
     await Storage.init();
 
     // Init Supabase auth
-    if (window.SupabaseClient) {
+    if (typeof SupabaseClient !== 'undefined') {
       await SupabaseClient.init();
       // If user is logged in, pull from supabase in background
       if (SupabaseClient.getUser()) {
@@ -122,7 +122,7 @@ const App = (() => {
       if (e.target.id === 'modal-overlay') closeModal();
     });
 
-    if (window.SupabaseClient && !SupabaseClient.getUser()) {
+    if (typeof SupabaseClient !== 'undefined' && !SupabaseClient.getUser()) {
       navigate('auth');
     } else {
       navigate('dashboard');

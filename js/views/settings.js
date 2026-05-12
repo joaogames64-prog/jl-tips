@@ -56,10 +56,10 @@ const SettingsView = (() => {
         <div class="card-header"><span class="card-title">☁️ Conta e Nuvem</span></div>
         <div style="display:flex; justify-content:space-between; align-items:center; padding: 4px 0;">
           <div>
-            <div style="font-weight:600">${window.SupabaseClient && SupabaseClient.getUser() ? SupabaseClient.getUser().email : 'Modo Offline (Local)'}</div>
-            <div style="font-size:12px; color:var(--text-muted)">${window.SupabaseClient && SupabaseClient.getUser() ? 'Sincronização ativa' : 'Faça login para salvar na nuvem'}</div>
+            <div style="font-weight:600">${typeof SupabaseClient !== 'undefined' && SupabaseClient.getUser() ? SupabaseClient.getUser().email : 'Modo Offline (Local)'}</div>
+            <div style="font-size:12px; color:var(--text-muted)">${typeof SupabaseClient !== 'undefined' && SupabaseClient.getUser() ? 'Sincronização ativa' : 'Faça login para salvar na nuvem'}</div>
           </div>
-          ${window.SupabaseClient && SupabaseClient.getUser() 
+          ${typeof SupabaseClient !== 'undefined' && SupabaseClient.getUser() 
             ? `<button class="btn btn-danger-soft btn-sm" onclick="SettingsView.logout()">Sair</button>`
             : `<button class="btn btn-primary btn-sm" onclick="App.navigate('auth')">Login</button>`
           }
@@ -72,7 +72,7 @@ const SettingsView = (() => {
           <div class="about-row"><span>App</span><span>BetTrack Pro</span></div>
           <div class="about-row"><span>Versão</span><span>1.1.0 (Cloud)</span></div>
           <div class="about-row"><span>Apostas registradas</span><span>${totalBets}</span></div>
-          <div class="about-row"><span>Armazenamento</span><span>${window.SupabaseClient && SupabaseClient.getUser() ? 'Supabase (Nuvem)' : 'LocalStorage (offline)'}</span></div>
+          <div class="about-row"><span>Armazenamento</span><span>${typeof SupabaseClient !== 'undefined' && SupabaseClient.getUser() ? 'Supabase (Nuvem)' : 'LocalStorage (offline)'}</span></div>
         </div>
       </div>
 

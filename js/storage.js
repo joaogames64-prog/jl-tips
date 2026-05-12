@@ -102,7 +102,7 @@ const Storage = (() => {
     cache.bets = cache.bets.filter(b => b.id !== id);
     dbDelete('bets', id);
     if(bet) recalcBankroll(bet.bankrollId);
-    if (window.SupabaseClient && SupabaseClient.getUser()) {
+    if (typeof SupabaseClient !== 'undefined' && SupabaseClient.getUser()) {
       SupabaseClient.supabase.from('bets').delete().eq('id', id).catch(console.error);
     }
     return true;
@@ -134,7 +134,7 @@ const Storage = (() => {
     dbDelete('bankrolls', id);
     cache.bets = cache.bets.filter(b => b.bankrollId !== id);
     dbSaveAll('bets', cache.bets);
-    if (window.SupabaseClient && SupabaseClient.getUser()) {
+    if (typeof SupabaseClient !== 'undefined' && SupabaseClient.getUser()) {
       SupabaseClient.supabase.from('bankrolls').delete().eq('id', id).catch(console.error);
     }
   };
@@ -170,7 +170,7 @@ const Storage = (() => {
   const updateSettings = upd => { 
     cache.settings = { ...getSettings(), ...upd }; 
     dbSaveSettings(); 
-    if (window.SupabaseClient && SupabaseClient.getUser()) {
+    if (typeof SupabaseClient !== 'undefined' && SupabaseClient.getUser()) {
       SupabaseClient.supabase.from('user_settings').upsert({ user_id: SupabaseClient.getUser().id, settings: cache.settings }).catch(console.error);
     }
     return cache.settings; 
@@ -211,7 +211,7 @@ const Storage = (() => {
 
   // --- SUPABASE SYNC ---
   const pullFromSupabase = async () => {
-    if (!window.SupabaseClient) return;
+    if (typeof SupabaseClient === 'undefined') return;
     const user = SupabaseClient.getUser();
     if (!user) return;
 
@@ -251,7 +251,7 @@ const Storage = (() => {
   };
 
   const pushAllToSupabase = async () => {
-    if (!window.SupabaseClient) return;
+    if (typeof SupabaseClient === 'undefined') return;
     const user = SupabaseClient.getUser();
     if (!user) return;
 
@@ -281,7 +281,7 @@ const Storage = (() => {
   };
 
   const syncBetToSupabase = async (bet) => {
-    if (!window.SupabaseClient) return;
+    if (typeof SupabaseClient === 'undefined') return;
     const user = SupabaseClient.getUser();
     if (!user) return;
     await SupabaseClient.supabase.from('bets').upsert({
@@ -292,7 +292,7 @@ const Storage = (() => {
   };
 
   const syncBankrollToSupabase = async (br) => {
-    if (!window.SupabaseClient) return;
+    if (typeof SupabaseClient === 'undefined') return;
     const user = SupabaseClient.getUser();
     if (!user) return;
     await SupabaseClient.supabase.from('bankrolls').upsert({
