@@ -53,20 +53,20 @@ const AuthView = (() => {
     try {
       if (isLogin) {
         await SupabaseClient.signIn(email, password);
-        App.showToast('Login realizado com sucesso!', 'success');
+        App.toast('Login realizado com sucesso!', 'success');
         
         // Puxa os dados da nuvem para o local
         await Storage.pullFromSupabase();
       } else {
         await SupabaseClient.signUp(email, password);
-        App.showToast('Conta criada! Verifique seu email ou faça login se já ativada.', 'success');
+        App.toast('Conta criada! Verifique seu email ou faça login se já ativada.', 'success');
         
         // Pergunta se quer subir dados locais pro supabase
         const localBets = Storage.getBets();
         if (localBets.length > 0) {
           if (confirm('Deseja migrar suas apostas e bancas atuais do celular para sua nova conta na nuvem?')) {
             await Storage.pushAllToSupabase();
-            App.showToast('Dados migrados com sucesso!', 'success');
+            App.toast('Dados migrados com sucesso!', 'success');
           }
         }
         
@@ -76,7 +76,7 @@ const AuthView = (() => {
         } catch(e) {}
       }
     } catch (err) {
-      App.showToast(err.message, 'error');
+      App.toast(err.message || 'Erro de autenticação', 'error');
     } finally {
       btn.innerHTML = isLogin ? 'Entrar' : 'Cadastrar';
       btn.disabled = false;
