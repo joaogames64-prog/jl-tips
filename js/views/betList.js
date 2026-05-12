@@ -100,7 +100,7 @@ const BetListView = (() => {
         ${badge}
       </div>
       <div class="bet-card-event">${b.event}</div>
-      <div class="bet-card-meta">${b.competition||''} ${b.market?'· '+b.market:''}</div>
+      <div class="bet-card-meta">${b.competition||''} ${b.market?'· '+b.market:''} ${b.pick?'· <strong>'+b.pick+'</strong>':''}</div>
       <div class="bet-card-bottom">
         <div class="bet-card-info">
           <span class="bet-tag">@${parseFloat(b.odd).toFixed(2)}</span>

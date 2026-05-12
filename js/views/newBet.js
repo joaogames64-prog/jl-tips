@@ -130,12 +130,17 @@ const NewBetView = (() => {
           <input type="text" id="event" class="form-input" placeholder="Ex: Flamengo x Palmeiras" value="${v('event')}" required>
         </div>
 
-        <!-- MERCADO — com categorias e busca -->
-        <div class="form-group">
-          <label class="form-label">Mercado</label>
-          <input type="text" id="market" class="form-input" placeholder="Busque ou digite um mercado..." value="${v('market')}" list="market-list" onfocus="NewBetView.showMarketPicker()" autocomplete="off">
-          <datalist id="market-list">${allMarkets.map(m=>`<option value="${m}">`).join('')}</datalist>
-          <small class="form-hint">Selecione abaixo ou digite um mercado personalizado</small>
+        <!-- MERCADO E PICK -->
+        <div class="form-row">
+          <div class="form-group" style="position:relative">
+            <label class="form-label">Mercado</label>
+            <input type="text" id="market" class="form-input" placeholder="Busque ou digite..." value="${v('market')}" list="market-list" onfocus="NewBetView.showMarketPicker()" autocomplete="off">
+            <datalist id="market-list">${allMarkets.map(m=>`<option value="${m}">`).join('')}</datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sua Escolha (Pick)</label>
+            <input type="text" id="pick" class="form-input" placeholder="Ex: Flamengo, Empate" value="${v('pick')||''}">
+          </div>
         </div>
 
         <!-- MARKET PICKER ACCORDION -->
@@ -235,6 +240,7 @@ const NewBetView = (() => {
       competition:  get('competition'),
       event:        get('event'),
       market:       get('market'),
+      pick:         get('pick') || '',
       bookmaker:    get('bookmaker'),
       odd:          parseFloat(get('odd')),
       stake:        parseFloat(get('stake')),

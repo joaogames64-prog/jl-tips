@@ -118,7 +118,7 @@ const DashboardView = (() => {
         <span class="sport-icon">${sportIcon(bet.sport)}</span>
         <div>
           <div class="bet-event">${bet.event}</div>
-          <div class="bet-meta">${d.toLocaleDateString('pt-BR')} · @${parseFloat(bet.odd).toFixed(2)}</div>
+          <div class="bet-meta">${d.toLocaleDateString('pt-BR')} · @${parseFloat(bet.odd).toFixed(2)} ${bet.pick ? '· <strong>'+bet.pick+'</strong>' : ''}</div>
         </div>
       </div>
       <div class="bet-row-right">
