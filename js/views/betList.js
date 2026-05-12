@@ -18,8 +18,9 @@ const BetListView = (() => {
 
     return `
     <div class="view-container">
-      <div class="page-header">
-        <h2>Apostas</h2>
+      <div class="page-header" style="gap:8px;justify-content:flex-start">
+        <h2 style="flex:1">Apostas</h2>
+        <button class="btn btn-ghost btn-sm" onclick="BetListView.syncResults()" title="Sincronizar Resultados" style="padding:6px 10px;font-size:16px">🔄</button>
         <button class="btn btn-primary btn-sm" onclick="App.navigate('new-bet')">＋ Nova</button>
       </div>
 
@@ -143,10 +144,45 @@ const BetListView = (() => {
     App.navigate('bet-list');
   };
 
+  const syncResults = async () => {
+    const s = Storage.getSettings();
+    if (!s.apiFootballKey) {
+      App.toast('Configure sua API Key nas Configurações!', 'error');
+      setTimeout(() => App.navigate('settings'), 1500);
+      return;
+    }
+
+    const br = Storage.getActiveBankroll();
+    if (!br) return;
+    const bets = Storage.getBets(br.id);
+    const pending = bets.filter(b => b.result === 'pending');
+    if (pending.length === 0) {
+      App.toast('Nenhuma aposta pendente para sincronizar', 'info');
+      return;
+    }
+
+    App.toast('Sincronizando...', 'info');
+    document.body.style.cursor = 'wait';
+    try {
+      const res = await ApiSync.syncPendingBets(bets);
+      if (res.errors > 0) {
+        App.toast('Alguns erros ocorreram na API', 'error');
+      } else if (res.updated > 0) {
+        App.toast(`${res.updated} aposta(s) resolvida(s)! ✅`, 'success');
+        App.navigate('bet-list');
+      } else {
+        App.toast('Nenhum resultado finalizado encontrado', 'info');
+      }
+    } catch (e) {
+      App.toast('Erro: ' + e.message, 'error');
+    }
+    document.body.style.cursor = 'default';
+  };
+
   const afterRender = () => {
     const si = document.getElementById('search-input');
     if(si) si.focus();
   };
 
-  return { render, afterRender, applyFilter, clearFilters, setDate };
+  return { render, afterRender, applyFilter, clearFilters, setDate, syncResults };
 })();

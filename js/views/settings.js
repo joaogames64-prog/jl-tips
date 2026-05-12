@@ -29,6 +29,16 @@ const SettingsView = (() => {
       </div>
 
       <div class="card">
+        <div class="card-header"><span class="card-title">🔑 API de Resultados</span></div>
+        <p class="text-muted" style="font-size:12px;margin-bottom:12px">Para sincronizar resultados automaticamente, insira sua API Key do <a href="https://www.api-football.com/" target="_blank" style="color:var(--primary-light);text-decoration:underline">API-Football</a>.</p>
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <input id="api-football-key" class="form-input" type="text" placeholder="Cole sua chave aqui..."
+            value="${s.apiFootballKey||''}" onchange="SettingsView.saveApiKey()">
+        </div>
+      </div>
+
+      <div class="card">
         <div class="card-header"><span class="card-title">💾 Dados</span></div>
         <div class="settings-actions">
           <button class="btn btn-ghost btn-full" onclick="SettingsView.exportData()">
@@ -73,6 +83,12 @@ const SettingsView = (() => {
     if(v && v > 0) { Storage.updateSettings({ defaultStake: v }); App.toast('Stake padrão salvo ✅','success'); }
   };
 
+  const saveApiKey = () => {
+    const key = document.getElementById('api-football-key')?.value || '';
+    Storage.updateSettings({ apiFootballKey: key });
+    App.toast('API Key salva ✅', 'success');
+  };
+
   const exportData = () => {
     const json = Storage.exportData();
     const blob = new Blob([json], { type: 'application/json' });
@@ -103,5 +119,5 @@ const SettingsView = (() => {
     });
   };
 
-  return { render, afterRender:()=>{}, setCurrency, saveStake, exportData, importData, confirmReset };
+  return { render, afterRender:()=>{}, setCurrency, saveStake, saveApiKey, exportData, importData, confirmReset };
 })();

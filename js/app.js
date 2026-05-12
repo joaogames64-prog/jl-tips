@@ -86,6 +86,12 @@ const App = (() => {
     // Wait for IndexedDB to load
     await Storage.init();
 
+    // Auto-apply user's API key if missing
+    const s = Storage.getSettings();
+    if (!s.apiFootballKey || s.apiFootballKey === '') {
+      Storage.updateSettings({ apiFootballKey: 'cc1c33cdad8cb2bba798b6fb4ae3bae4' });
+    }
+
     const main = document.getElementById('main-content');
     main.innerHTML = DashboardView.render();
     DashboardView.afterRender();

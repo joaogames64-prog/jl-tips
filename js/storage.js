@@ -8,7 +8,8 @@ const Storage = (() => {
 
   const defaultSettings = () => ({
     currency:'BRL', currencySymbol:'R$', activeBankrollId:null,
-    theme:'dark', stakeMethod:'fixed', defaultStake:50, unit:50
+    theme:'dark', stakeMethod:'fixed', defaultStake:50, unit:50,
+    apiFootballKey: ''
   });
 
   const uuid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
