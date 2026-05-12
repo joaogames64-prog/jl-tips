@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#060D15">
+  <meta name="description" content="JL Tips — Gestão profissional de apostas esportivas">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>JL Tips</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <button id="header-back" class="header-back" style="display:none">←</button>
+    <div class="header-logo-wrap">
+      <img src="assets/logo.png" alt="JL Tips" class="header-logo-img">
+      <span id="header-title" class="header-brand">JL Tips</span>
+    </div>
+    <span id="header-balance" class="header-balance">R$ —</span>
+  </header>
+
+  <!-- MAIN -->
+  <main id="main-content">
+    <div class="view-container" style="text-align:center;padding-top:80px">
+      <div style="font-size:40px;margin-bottom:12px">⚡</div>
+      <p style="color:var(--text-muted)">Carregando...</p>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="nav-item" id="nav-dashboard"   data-route="dashboard"><span class="nav-icon">🏠</span><span>Home</span></div>
+    <div class="nav-item" id="nav-bet-list"    data-route="bet-list"><span class="nav-icon">📋</span><span>Apostas</span></div>
+    <div class="nav-item" id="nav-analytics"   data-route="analytics"><span class="nav-icon">📊</span><span>Analytics</span></div>
+    <div class="nav-item" id="nav-calculators" data-route="calculators"><span class="nav-icon">🧮</span><span>Calcular</span></div>
+    <div class="nav-item" id="nav-bankroll"    data-route="bankroll"><span class="nav-icon">💰</span><span>Bancas</span></div>
+    <div class="nav-item" id="nav-settings"    data-route="settings"><span class="nav-icon">⚙️</span><span>Config</span></div>
+  </nav>
+
+  <!-- MODAL -->
+  <div id="modal-overlay" class="modal-overlay"><div class="modal-box"><div id="modal-body"></div></div></div>
+
+  <!-- TOAST -->
+  <div id="toast-container"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/storage.js"></script>
+  <script src="js/utils/calc.js"></script>
+  <script src="js/utils/charts.js"></script>
+  <script src="js/utils/dateFilter.js"></script>
+  <script src="js/views/dashboard.js"></script>
+  <script src="js/views/newBet.js"></script>
+  <script src="js/views/betList.js"></script>
+  <script src="js/views/analytics.js"></script>
+  <script src="js/views/bankroll.js"></script>
+  <script src="js/views/calculators.js"></script>
+  <script src="js/views/settings.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+    document.addEventListener('click', () => setTimeout(() => App.updateBankrollHeader?.(), 200));
+  </script>
+</body>
+</html>
