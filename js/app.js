@@ -1,5 +1,6 @@
 const App = (() => {
   const routes = {
+    'auth':        { view: AuthView,        title: 'Login',        icon: '🛡️' },
     'dashboard':   { view: DashboardView,   title: 'Dashboard',    icon: '🏠' },
     'games':       { view: GamesView,       title: 'Jogos do Dia', icon: '⚽' },
     'new-bet':     { view: NewBetView,      title: 'Nova Aposta',  icon: '➕' },
@@ -86,6 +87,15 @@ const App = (() => {
   const init = async () => {
     // Wait for IndexedDB to load
     await Storage.init();
+
+    // Init Supabase auth
+    if (window.SupabaseClient) {
+      await SupabaseClient.init();
+      // If user is logged in, pull from supabase in background
+      if (SupabaseClient.getUser()) {
+        Storage.pullFromSupabase().catch(console.error);
+      }
+    }
 
     // Auto-apply user's API key if missing
     const s = Storage.getSettings();

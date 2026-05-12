@@ -81,6 +81,7 @@ const Storage = (() => {
     cache.bets.push(nb);
     dbPut('bets', nb);
     if(bet.result !== 'pending') recalcBankroll(bet.bankrollId);
+    syncBetToSupabase(nb).catch(console.error);
     return nb;
   };
 
@@ -92,6 +93,7 @@ const Storage = (() => {
     cache.bets[idx] = m;
     dbPut('bets', m);
     recalcBankroll(m.bankrollId);
+    syncBetToSupabase(m).catch(console.error);
     return m;
   };
 
@@ -100,6 +102,9 @@ const Storage = (() => {
     cache.bets = cache.bets.filter(b => b.id !== id);
     dbDelete('bets', id);
     if(bet) recalcBankroll(bet.bankrollId);
+    if (window.SupabaseClient && SupabaseClient.getUser()) {
+      SupabaseClient.supabase.from('bets').delete().eq('id', id).catch(console.error);
+    }
     return true;
   };
 
@@ -111,6 +116,7 @@ const Storage = (() => {
     const nb = { ...data, id: uuid(), transactions: [], createdAt: new Date().toISOString() };
     cache.bankrolls.push(nb);
     dbPut('bankrolls', nb);
+    syncBankrollToSupabase(nb).catch(console.error);
     return nb;
   };
 
@@ -119,6 +125,7 @@ const Storage = (() => {
     if(idx === -1) return null;
     cache.bankrolls[idx] = { ...cache.bankrolls[idx], ...upd };
     dbPut('bankrolls', cache.bankrolls[idx]);
+    syncBankrollToSupabase(cache.bankrolls[idx]).catch(console.error);
     return cache.bankrolls[idx];
   };
 
@@ -127,6 +134,9 @@ const Storage = (() => {
     dbDelete('bankrolls', id);
     cache.bets = cache.bets.filter(b => b.bankrollId !== id);
     dbSaveAll('bets', cache.bets);
+    if (window.SupabaseClient && SupabaseClient.getUser()) {
+      SupabaseClient.supabase.from('bankrolls').delete().eq('id', id).catch(console.error);
+    }
   };
 
   const addTransaction = (bankrollId, tx) => {
@@ -144,6 +154,7 @@ const Storage = (() => {
       br.currentBalance = +((br.currentBalance - amt).toFixed(2));
     }
     dbPut('bankrolls', br);
+    syncBankrollToSupabase(br).catch(console.error);
     return ntx;
   };
 
@@ -156,7 +167,14 @@ const Storage = (() => {
 
   // ── SETTINGS ──────────────────────────────
   const getSettings = () => cache.settings || defaultSettings();
-  const updateSettings = upd => { cache.settings = { ...getSettings(), ...upd }; dbSaveSettings(); return cache.settings; };
+  const updateSettings = upd => { 
+    cache.settings = { ...getSettings(), ...upd }; 
+    dbSaveSettings(); 
+    if (window.SupabaseClient && SupabaseClient.getUser()) {
+      SupabaseClient.supabase.from('user_settings').upsert({ user_id: SupabaseClient.getUser().id, settings: cache.settings }).catch(console.error);
+    }
+    return cache.settings; 
+  };
 
   const getActiveBankroll = () => {
     const s = getSettings();
@@ -165,7 +183,6 @@ const Storage = (() => {
     return null;
   };
 
-  // ── IMPORT / EXPORT ───────────────────────
   const exportData = () => JSON.stringify({
     bets: cache.bets, bankrolls: cache.bankrolls, settings: cache.settings, exportedAt: new Date().toISOString()
   }, null, 2);
@@ -192,11 +209,104 @@ const Storage = (() => {
     }
   };
 
+  // --- SUPABASE SYNC ---
+  const pullFromSupabase = async () => {
+    if (!window.SupabaseClient) return;
+    const user = SupabaseClient.getUser();
+    if (!user) return;
+
+    const { supabase } = SupabaseClient;
+    
+    // Pull Bets
+    const { data: betsData } = await supabase.from('bets').select('*');
+    if (betsData) {
+      // Convert db snake_case to app camelCase
+      const mappedBets = betsData.map(b => ({
+        id: b.id, event: b.event, sport: b.sport, betType: b.bet_type, market: b.market,
+        pick: b.pick, odd: parseFloat(b.odd), stake: parseFloat(b.stake), result: b.result,
+        date: b.date, returnAmount: b.return_amount ? parseFloat(b.return_amount) : null,
+        competition: b.competition
+      }));
+      cache.bets = mappedBets;
+      dbSaveAll('bets', mappedBets);
+    }
+
+    // Pull Bankrolls
+    const { data: brData } = await supabase.from('bankrolls').select('*');
+    if (brData) {
+      const mappedBR = brData.map(br => ({
+        id: br.id, name: br.name, initialBalance: parseFloat(br.initial_amount),
+        currentBalance: parseFloat(br.current_amount), currency: br.currency
+      }));
+      cache.bankrolls = mappedBR;
+      dbSaveAll('bankrolls', mappedBR);
+    }
+
+    // Pull Settings
+    const { data: settingsData } = await supabase.from('user_settings').select('*').single();
+    if (settingsData && settingsData.settings) {
+      cache.settings = { ...defaultSettings(), ...settingsData.settings };
+      dbSaveSettings();
+    }
+  };
+
+  const pushAllToSupabase = async () => {
+    if (!window.SupabaseClient) return;
+    const user = SupabaseClient.getUser();
+    if (!user) return;
+
+    const { supabase } = SupabaseClient;
+
+    if (cache.bets.length > 0) {
+      const mappedBets = cache.bets.map(b => ({
+        id: b.id, user_id: user.id, event: b.event, sport: b.sport, bet_type: b.betType,
+        market: b.market, pick: b.pick, odd: b.odd, stake: b.stake, result: b.result,
+        date: new Date(b.date).toISOString(), return_amount: b.returnAmount, competition: b.competition
+      }));
+      await supabase.from('bets').upsert(mappedBets);
+    }
+
+    if (cache.bankrolls.length > 0) {
+      const mappedBR = cache.bankrolls.map(br => ({
+        id: br.id, user_id: user.id, name: br.name, initial_amount: br.initialBalance,
+        current_amount: br.currentBalance, currency: br.currency
+      }));
+      await supabase.from('bankrolls').upsert(mappedBR);
+    }
+
+    await supabase.from('user_settings').upsert({
+      user_id: user.id,
+      settings: cache.settings
+    });
+  };
+
+  const syncBetToSupabase = async (bet) => {
+    if (!window.SupabaseClient) return;
+    const user = SupabaseClient.getUser();
+    if (!user) return;
+    await SupabaseClient.supabase.from('bets').upsert({
+      id: bet.id, user_id: user.id, event: bet.event, sport: bet.sport, bet_type: bet.betType,
+      market: bet.market, pick: bet.pick, odd: bet.odd, stake: bet.stake, result: bet.result,
+      date: new Date(bet.date).toISOString(), return_amount: bet.returnAmount, competition: bet.competition
+    });
+  };
+
+  const syncBankrollToSupabase = async (br) => {
+    if (!window.SupabaseClient) return;
+    const user = SupabaseClient.getUser();
+    if (!user) return;
+    await SupabaseClient.supabase.from('bankrolls').upsert({
+      id: br.id, user_id: user.id, name: br.name, initial_amount: br.initialBalance,
+      current_amount: br.currentBalance, currency: br.currency
+    });
+  };
+
   // No seed — app starts empty
   const seed = () => {};
 
   return { init, uuid, calcProfit, getBets, getBet, addBet, updateBet, deleteBet,
     getBankrolls, getBankroll, addBankroll, updateBankroll, deleteBankroll,
     addTransaction, recalcBankroll, getSettings, updateSettings, getActiveBankroll,
-    exportData, importData, resetAll, seed };
+    exportData, importData, resetAll, seed, pullFromSupabase, pushAllToSupabase,
+    syncBetToSupabase, syncBankrollToSupabase };
 })();
