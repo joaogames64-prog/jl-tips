@@ -214,5 +214,10 @@ const ApiSync = (() => {
     return { checked: pending.length, updated: updatedCount, errors: errorCount };
   };
 
-  return { syncPendingBets };
+  const getTodayFixtures = async () => {
+    const today = new Date().toISOString().substring(0, 10);
+    return fetchFixturesByDate(today);
+  };
+
+  return { syncPendingBets, getTodayFixtures };
 })();

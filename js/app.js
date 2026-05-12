@@ -1,6 +1,7 @@
 const App = (() => {
   const routes = {
     'dashboard':   { view: DashboardView,   title: 'Dashboard',    icon: '🏠' },
+    'games':       { view: GamesView,       title: 'Jogos do Dia', icon: '⚽' },
     'new-bet':     { view: NewBetView,      title: 'Nova Aposta',  icon: '➕' },
     'bet-list':    { view: BetListView,     title: 'Apostas',      icon: '📋' },
     'analytics':   { view: AnalyticsView,   title: 'Analytics',    icon: '📊' },

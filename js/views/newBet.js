@@ -62,14 +62,27 @@ const NewBetView = (() => {
     return [...new Set(all)];
   };
 
-  const render = (betId = null) => {
-    editingId = betId || null;
+  const render = (param = null) => {
+    let betId = null;
+    let prefill = {};
+    if (param) {
+      if (param.startsWith('%7B')) param = decodeURIComponent(param);
+      if (param.startsWith('{')) {
+        try { prefill = JSON.parse(param); } catch(e){}
+      } else {
+        betId = param;
+      }
+    }
+    
+    editingId = betId;
     const bet = betId ? Storage.getBet(betId) : null;
     const sym = Storage.getSettings().currencySymbol || 'R$';
     const ds  = Storage.getSettings().defaultStake || 50;
     const now = new Date();
     const defaultDate = now.toISOString().slice(0,16);
-    const v = f => bet ? (bet[f]??'') : '';
+    
+    // v() fetches from bet first, then prefill, then empty
+    const v = f => bet ? (bet[f]??'') : (prefill[f]??'');
     const allMarkets = getAllMarkets();
 
     return `
