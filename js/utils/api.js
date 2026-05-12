@@ -219,5 +219,12 @@ const ApiSync = (() => {
     return fetchFixturesByDate(today);
   };
 
-  return { syncPendingBets, getTodayFixtures };
+  const getTodayBasketballGames = async () => {
+    const today = new Date().toISOString().substring(0, 10);
+    const url = `https://v1.basketball.api-sports.io/games?date=${today}`;
+    // Using a different cache key prefix so it doesn't conflict
+    return fetchWithCache(url, cache.fixturesByDate, `basket_${today}`);
+  };
+
+  return { syncPendingBets, getTodayFixtures, getTodayBasketballGames };
 })();

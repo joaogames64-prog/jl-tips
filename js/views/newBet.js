@@ -108,7 +108,7 @@ const NewBetView = (() => {
         <div class="form-section">
           <label class="form-label">Esporte</label>
           <div class="chip-group" id="sport-group">
-            ${sports.map(s=>`<button type="button" class="chip ${bet&&bet.sport===s?'chip-active':''}" data-field="sport" data-value="${s}" onclick="NewBetView.selectChip(this,'sport-group')">${DashboardView.sportIcon(s)} ${s}</button>`).join('')}
+            ${sports.map(s=>`<button type="button" class="chip ${v('sport')===s?'chip-active':''}" data-field="sport" data-value="${s}" onclick="NewBetView.selectChip(this,'sport-group')">${DashboardView.sportIcon(s)} ${s}</button>`).join('')}
           </div>
           <input type="hidden" id="sport" value="${v('sport')||''}">
         </div>
