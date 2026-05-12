@@ -1,5 +1,5 @@
 const SUPABASE_URL = 'https://gnyzehzmakxunyktxoqa.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_G_uRLoO3CjpGrxGt2w87pg_8WR2V1CG';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdueXplaHptYWt4dW55a3R4b3FhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDc1MjgsImV4cCI6MjA5NDE4MzUyOH0.hTfYstjfplu9WJjll42UGFUfdaF5OUQ7JkS0cEdoYZo';
 
 const SupabaseClient = (() => {
   // Create Supabase client instance (avoids name collision with global 'supabase')

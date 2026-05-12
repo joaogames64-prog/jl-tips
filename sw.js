@@ -1,4 +1,4 @@
-const CACHE = 'bettrack-v3';
+const CACHE = 'bettrack-v4';
 const ASSETS = ['./', './index.html', './css/style.css', './js/storage.js', './js/utils/calc.js', './js/utils/charts.js', './js/utils/dateFilter.js', './js/utils/api.js', './js/utils/supabaseClient.js', './js/views/auth.js', './js/views/dashboard.js', './js/views/games.js', './js/views/newBet.js', './js/views/betList.js', './js/views/analytics.js', './js/views/bankroll.js', './js/views/calculators.js', './js/views/settings.js', './js/app.js'];
 self.addEventListener('install',  e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(()=>{})));
 self.addEventListener('activate', e => {
