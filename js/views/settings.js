@@ -51,13 +51,28 @@ const SettingsView = (() => {
         </div>
       </div>
 
+      <!-- CONTA -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">☁️ Conta e Nuvem</span></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 4px 0;">
+          <div>
+            <div style="font-weight:600">${window.SupabaseClient && SupabaseClient.getUser() ? SupabaseClient.getUser().email : 'Modo Offline (Local)'}</div>
+            <div style="font-size:12px; color:var(--text-muted)">${window.SupabaseClient && SupabaseClient.getUser() ? 'Sincronização ativa' : 'Faça login para salvar na nuvem'}</div>
+          </div>
+          ${window.SupabaseClient && SupabaseClient.getUser() 
+            ? `<button class="btn btn-danger-soft btn-sm" onclick="SettingsView.logout()">Sair</button>`
+            : `<button class="btn btn-primary btn-sm" onclick="App.navigate('auth')">Login</button>`
+          }
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header"><span class="card-title">ℹ️ Sobre</span></div>
         <div class="about-info">
           <div class="about-row"><span>App</span><span>BetTrack Pro</span></div>
-          <div class="about-row"><span>Versão</span><span>1.0.0</span></div>
+          <div class="about-row"><span>Versão</span><span>1.1.0 (Cloud)</span></div>
           <div class="about-row"><span>Apostas registradas</span><span>${totalBets}</span></div>
-          <div class="about-row"><span>Armazenamento</span><span>LocalStorage (offline)</span></div>
+          <div class="about-row"><span>Armazenamento</span><span>${window.SupabaseClient && SupabaseClient.getUser() ? 'Supabase (Nuvem)' : 'LocalStorage (offline)'}</span></div>
         </div>
       </div>
 
@@ -119,5 +134,18 @@ const SettingsView = (() => {
     });
   };
 
-  return { render, afterRender:()=>{}, setCurrency, saveStake, saveApiKey, exportData, importData, confirmReset };
+  const logout = async () => {
+    App.confirm('Sair da conta vai apagar os dados deste aparelho por segurança. Tem certeza?', async () => {
+      try {
+        await SupabaseClient.signOut();
+        Storage.resetAll();
+        App.toast('Logout realizado', 'success');
+        App.navigate('auth');
+      } catch(e) {
+        App.toast('Erro ao sair', 'error');
+      }
+    });
+  };
+
+  return { render, afterRender:()=>{}, setCurrency, saveStake, saveApiKey, exportData, importData, confirmReset, logout };
 })();
