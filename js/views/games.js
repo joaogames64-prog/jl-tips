@@ -63,7 +63,7 @@ const GamesView = (() => {
 
       // Payload for newBet
       const payloadStr = encodeURIComponent(JSON.stringify({
-        event: \`\${g.teams.home.name} x \${g.teams.away.name}\`,
+        event: `${g.teams.home.name} x ${g.teams.away.name}`,
         competition: g.league.name
       }));
 
