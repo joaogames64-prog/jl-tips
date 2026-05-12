@@ -22,7 +22,16 @@ const App = (() => {
 
     const main  = document.getElementById('main-content');
     const title = document.getElementById('header-title');
+    const bottomNav = document.querySelector('.bottom-nav');
     const view  = routes[route].view;
+
+    if (route === 'auth') {
+      bottomNav.style.display = 'none';
+      main.style.paddingBottom = '0';
+    } else {
+      bottomNav.style.display = 'flex';
+      main.style.paddingBottom = '80px';
+    }
 
     main.classList.add('page-exit');
     setTimeout(() => {
@@ -104,9 +113,6 @@ const App = (() => {
     }
 
     const main = document.getElementById('main-content');
-    main.innerHTML = DashboardView.render();
-    DashboardView.afterRender();
-    updateBankrollHeader();
 
     document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', () => navigate(item.dataset.route));
@@ -115,7 +121,12 @@ const App = (() => {
     document.getElementById('modal-overlay').addEventListener('click', (e) => {
       if (e.target.id === 'modal-overlay') closeModal();
     });
-    document.getElementById('nav-dashboard').classList.add('nav-active');
+
+    if (window.SupabaseClient && !SupabaseClient.getUser()) {
+      navigate('auth');
+    } else {
+      navigate('dashboard');
+    }
   };
 
   return { navigate, back, toast, openModal, closeModal, confirm, updateBankrollHeader, init };
